@@ -3,11 +3,11 @@ using System.Text;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
-namespace FeedProducts
+namespace FeedProducts.FileReader
 {
     public class YamlFileReader : IFileReader
     {
-        public void Read(string path)
+        public List<ProductInventory> Read(string path)
         {
             try
             {
@@ -17,27 +17,29 @@ namespace FeedProducts
                 var yamlData = deserializer.Deserialize<List<YamlConfig>>(File.ReadAllText(path));
                 if (yamlData != null)
                 {
+                    var yamlInventory = new List<ProductInventory>();
                     foreach (var item in yamlData)
                     {
-                        StringBuilder str = new StringBuilder();
-                        str.Append($"importing: Name: {item.Name}; Categories: {item.Tags};");
-                        if (item.Twitter != null)
+                        yamlInventory.Add(new ProductInventory()
                         {
-                            str.Append($" Twitter: {item.Twitter};");
-                        }
-                        Console.Write($"{str} \n");
+                            Title = item.Name,
+                            Categories = item.Tags,
+                            Twitter = item.Twitter,
+                        });
                     }
-                    Console.ReadLine();
+
+                    return yamlInventory;
                 }
                 else
                 {
-                    throw new ArgumentException("Parsing Error");
+                    throw new ArgumentException(Constants.Constants.ParsingError);
                 }
-                
+
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Problem reading file: {ex.Message}");
+                Console.WriteLine($"{Constants.Constants.ProblemReadingFile}, {ex.Message}");
+                throw;
             }
         }
     }

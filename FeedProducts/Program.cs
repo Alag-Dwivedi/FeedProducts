@@ -1,66 +1,38 @@
-﻿// See https://aka.ms/new-console-template for more information
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-
-
-
-//static dynamic Read(string path)
-//{
-//    using (StreamReader file = new StreamReader(path))
-//    {
-//        try
-//        {
-//            string json = file.ReadToEnd();
-
-//            var serializerSettings = new JsonSerializerSettings
-//            {
-//                ContractResolver = new CamelCasePropertyNamesContractResolver()
-//            };
-
-//            return JsonConvert.DeserializeObject<dynamic>(json, serializerSettings);
-//        }
-//        catch (Exception)
-//        {
-//            Console.WriteLine("Problem reading file");
-
-//            return null;
-//        }
-//    }
-//}
-//var data = Read("../../../feed-products/softwareadvice.json");
-
-//Console.WriteLine(data);
-
+﻿using FeedProducts.Factory;
+using FeedProducts.FileReader;
+using FeedProducts.Writer;
 
 namespace FeedProducts
 {
     public static class Program
     {
-
-        /// <summary>
-        ///   ../../../feed-products/softwareadvice.json
-        ///   ../../../feed-products/capterra.yaml
-        /// </summary>
-        /// <param name="args"></param>
         static void Main(string[] args)
         {
-            Console.WriteLine("Please enter the file path:");
+            Console.WriteLine(Constants.Constants.EnterFilePath);
             var filePath = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(filePath))
-            {
-                throw new ArgumentNullException("Command can't be empty");
-            }
-            if(!filePath.Contains("import"))
-            {
-                throw new ArgumentException("Invalid Input");
-            }
+            ValidateFilePath(filePath);
             FileReaderFactory fileReader = new ConcreteFileReaderFactory();
             var path = filePath.Split(" ");
             IFileReader reader = fileReader.GetFileReader(path[2]);
-            var rootPath = AppContext.BaseDirectory.Substring(0, AppContext.BaseDirectory.LastIndexOf("FeedProducts")) + path[2];
-            reader.Read(rootPath);
+            var rootPath = AppContext.BaseDirectory.Substring(0, AppContext.BaseDirectory.LastIndexOf(Constants.Constants.FeedProducts)) + path[2];
+            var inventory = reader.Read(rootPath);
+            inventory.Write();
         }
 
-
+        static void ValidateFilePath(string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                throw new ArgumentNullException(Constants.Constants.EmptyPath);
+            }
+            if (!filePath.Trim().ToLower().Contains(Constants.Constants.Import))
+            {
+                throw new ArgumentException(Constants.Constants.InvalidCommand);
+            }
+            if(filePath.Split(" ").Length < 3)
+            {
+                throw new ArgumentException(Constants.Constants.InvalidCommand);
+            }
+        }
     }
 }

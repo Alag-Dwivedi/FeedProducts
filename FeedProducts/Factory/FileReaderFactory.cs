@@ -1,4 +1,6 @@
-﻿namespace FeedProducts
+﻿using FeedProducts.FileReader;
+
+namespace FeedProducts.Factory
 {
     public abstract class FileReaderFactory
     {

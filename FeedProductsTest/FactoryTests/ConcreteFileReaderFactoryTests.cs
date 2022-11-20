@@ -1,6 +1,7 @@
-using FeedProducts;
+using FeedProducts.Factory;
+using FeedProducts.FileReader;
 
-namespace FeedProductsTest
+namespace FeedProductsTest.FactoryTests
 {
     public class ConcreteFileReaderFactoryTests
     {
